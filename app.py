@@ -48,12 +48,25 @@ def services():
 def services():
     form = UploadFileForm()
     x=[]
+    x1 = ''
+    x2 = ''
+    openai.api_key = "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"
     if request.method == "POST":
         file = form.file.data
         file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(file.filename)))
         x = execute()
-    return render_template('Services.html', form=form, x=x)
-# https://www.google.kz/search?q=2DnHWraKtR4v5vUzBbSy0FHEN23_5KfXy9zkA83dL9UpPgzFA&ie=UTF-8&oe=UTF-8&hl=en-kz&client=safari
+        x1 = 'On the pictures you can see:' \
+             '1 - ' + x[0][0], '2 - ' + x[0][1], '3 - ' + x[0][2], '4 - ' + x[0][3], '5 - ' + x[0][4]
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+
+        prompt = f'Act like a Dermamarker, which is ai that detects and explains, recommends how to treat skin disease. Firstly, Interpret what is the possibility of skin diseases of the person(client) according to list below. Then recommend what to do. Dont sфн that it is a provided list. Say like you did this analysis. Be confident, and say everything like you did it all. Exactly say statistics to make sure client understands. Dont recommend dermatologist. Explain what is it and what to do in 500 words minimum. Write in a structred, specific way [{x[3]}]'
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=1024,
+            stop=None,
+            temperature=0.5,
+        )
+        x2 = response.choices[0].text.strip()
+
+    return render_template('Services.html', form=form, x=x, x1=x1, x2=x2)
